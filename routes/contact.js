@@ -1,4 +1,5 @@
 var express = require('express');
+const contact = require('../model/contact');
 var router = express.Router();
 var Contact = require('../model/contact')
 
@@ -37,7 +38,7 @@ router.get('/delete/:id', function (req, res,next) {
     res.redirect('/contact');
 
 })
-//update
+//update contact
 router.get('/update/:id', function(req, res, next) {
     var id = req.params.id;
 
@@ -59,6 +60,43 @@ router.post('/update/:id',function (req,res,next) {
     res.redirect("/contact")
     
 })
+
+//2 methode update 
+router.get('/updatee/:id', function(req, res, next) {
+    var id = req.params.id;
+
+    Contact.findById({_id:id}, (err,data)=>{
+        if(err) throw err ;
+        res.render('update.twig',{data})
+    })
+});
+router.post('/updatee',function (req,res,next) {
+    let id = req.body.id;
+
+    Contact.findById({_id:id},function (err,doc){
+        doc.FullName=req.body.FullName;
+        doc.Phone=req.body.Phone;
+        doc.save();
+    });
+    res.redirect("/contact/")
+
+})
+// search
+router.get('/search',(req,res)=>{  
+    try {  
+    contact.find({$or:[{FullName:{'$regex':req.query.search}},{Phone:{'$eq':req.query.search}}]},(err,data)=>{  
+    if(err){  
+    console.log(err);  
+    }else{  
+    res.render('getAllContact.twig',{data:data});  
+    }  
+    })  
+    } catch (error) {  
+    console.log(error);  
+    }  
+    });  
+
+
 
 
 
